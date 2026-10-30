@@ -43,6 +43,9 @@ public class BuyGroup {
     @Column(nullable = false,  updatable = false)
     private Instant createdAt;
 
+    @Column
+    private Instant biddingDeadline;
+
     @Version
     private Long version;
 

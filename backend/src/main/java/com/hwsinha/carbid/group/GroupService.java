@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.Instant;
 
 @Service
@@ -69,6 +70,7 @@ public class GroupService {
         memberRepository.saveAndFlush(member);
         if (memberRepository.countByGroupId(groupId)>= group.getMinMembers()){
             group.setStatus(GroupStatus.BIDDING);
+            group.setBiddingDeadline(Instant.now().plus(Duration.ofHours(48)));
         }
         return toResponse(group);
     }
