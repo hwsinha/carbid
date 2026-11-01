@@ -1,5 +1,6 @@
 package com.hwsinha.carbid.group;
 
+import com.hwsinha.carbid.bid.Bid;
 import com.hwsinha.carbid.car.Car;
 import com.hwsinha.carbid.user.User;
 import jakarta.persistence.*;
@@ -45,6 +46,10 @@ public class BuyGroup {
 
     @Column
     private Instant biddingDeadline;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "winning_bid_id")
+    private Bid winningBid;
 
     @Version
     private Long version;
