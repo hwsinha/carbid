@@ -11,7 +11,6 @@ public record CreateGroupRequest(
         @NotNull Long carId,
         @NotBlank String city,
         @Min(2) int minMembers,
-        @NotNull @Future Instant deadline,
-        @NotNull Long createdById
+        @NotNull @Future Instant deadline
         ) {
 }

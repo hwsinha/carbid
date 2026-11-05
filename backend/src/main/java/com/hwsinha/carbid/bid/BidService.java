@@ -24,12 +24,10 @@ public class BidService {
     private final DealerRepository dealerRepository;
 
     @Transactional
-    public BidResponse placeBid(Long groupId, PlaceBidRequest request) {
+    public BidResponse placeBid(Long groupId, PlaceBidRequest request, Dealer dealer) {
         BuyGroup group = buyGroupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, " Group not found"));
-        Dealer dealer = dealerRepository.findById(request.dealerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Dealer not found"));
-        if (group.getStatus() != GroupStatus.BIDDING) {
+         if (group.getStatus() != GroupStatus.BIDDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Group is not accepting bids");
         }
         if (group.getBiddingDeadline() == null || group.getBiddingDeadline().isBefore(Instant.now())) {
