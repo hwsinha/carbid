@@ -4,7 +4,6 @@ import com.hwsinha.carbid.car.Car;
 import com.hwsinha.carbid.car.CarRepository;
 import com.hwsinha.carbid.group.dto.CreateGroupRequest;
 import com.hwsinha.carbid.group.dto.GroupResponse;
-import com.hwsinha.carbid.group.dto.JoinGroupRequest;
 import com.hwsinha.carbid.user.User;
 import com.hwsinha.carbid.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,11 @@ public class GroupService {
     private final UserRepository userRepository;
 
     @Transactional
-    public GroupResponse createGroup(CreateGroupRequest request) {
+    public GroupResponse createGroup(Long userId,
+                                     CreateGroupRequest request) {
         Car car= carRepository.findById(request.carId())
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found"));
-        User creator= userRepository.findById(request.createdById())
+        User creator= userRepository.findById(userId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         BuyGroup group=new BuyGroup();
@@ -50,10 +50,10 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupResponse joinGroup(Long groupId, JoinGroupRequest request) {
+    public GroupResponse joinGroup(Long groupId, Long userId) {
         BuyGroup group=groupRepository.findById(groupId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
-        User user=userRepository.findById(request.userId())
+        User user=userRepository.findById(userId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (group.getStatus()!= GroupStatus.OPEN) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Group is not open");
@@ -61,7 +61,7 @@ public class GroupService {
         if(group.getDeadline().isBefore(Instant.now())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Deadline is passed");
         }
-        if(memberRepository.existsByGroupIdAndUserId(groupId,user.getId())){
+        if(memberRepository.existsByGroupIdAndUserId(groupId,userId)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "already a member");
         }
         GroupMember member=new GroupMember();
