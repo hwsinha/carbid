@@ -1,5 +1,7 @@
 package com.hwsinha.carbid.auth;
 
+import com.hwsinha.carbid.auth.dto.LoginRequest;
+import com.hwsinha.carbid.auth.dto.LoginResponse;
 import com.hwsinha.carbid.auth.dto.RegisterRequest;
 import com.hwsinha.carbid.user.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -22,5 +24,12 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request){
         UserResponse body=authService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest request){
+        LoginResponse body=authService.login(request);
+        return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 }
