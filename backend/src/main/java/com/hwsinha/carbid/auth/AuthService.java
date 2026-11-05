@@ -1,6 +1,9 @@
 package com.hwsinha.carbid.auth;
 
+import com.hwsinha.carbid.auth.dto.LoginRequest;
+import com.hwsinha.carbid.auth.dto.LoginResponse;
 import com.hwsinha.carbid.auth.dto.RegisterRequest;
+import com.hwsinha.carbid.security.JwtService;
 import com.hwsinha.carbid.user.Role;
 import com.hwsinha.carbid.user.User;
 import com.hwsinha.carbid.user.UserRepository;
@@ -19,11 +22,12 @@ import java.util.Locale;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional
     public UserResponse registerUser(RegisterRequest request) {
         String email = request.email().trim().toLowerCase(Locale.ROOT);
-        if(userRepository.existsByEmail(request.email())) {
+        if(userRepository.existsByEmail(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
         String passwordHash = passwordEncoder.encode(request.password());
@@ -35,6 +39,17 @@ public class AuthService {
         user.setRole(Role.BUYER);
         User savedUser=userRepository.save(user);
         return toUserResponse(savedUser);
+    }
+
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        User user= userRepository.findByEmail(email)
+                .filter(u-> passwordEncoder.matches(request.password(), u.getPasswordHash()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+
+        String token=jwtService.generateToken(user);
+        return new LoginResponse(token,"Bearer", jwtService.getExpirySeconds());
     }
 
     private UserResponse toUserResponse(User savedUser) {
