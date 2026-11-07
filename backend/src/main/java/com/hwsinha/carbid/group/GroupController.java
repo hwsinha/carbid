@@ -6,6 +6,7 @@ import com.hwsinha.carbid.group.dto.GroupDetailResponse;
 import com.hwsinha.carbid.group.dto.GroupResponse;
 import com.hwsinha.carbid.group.dto.GroupSummaryResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -43,7 +44,7 @@ public class GroupController {
 
     @GetMapping
     public PageResponse<GroupSummaryResponse> list(
-            @RequestParam String city,
+            @RequestParam @NotBlank String city,
             @RequestParam(defaultValue = "OPEN") GroupStatus status,
             @PageableDefault(size = 10, sort = "deadline")Pageable pageable){
         return groupService.listGroups(city, status, pageable);
