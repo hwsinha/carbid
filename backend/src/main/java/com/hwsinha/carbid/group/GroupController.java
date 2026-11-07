@@ -2,6 +2,7 @@ package com.hwsinha.carbid.group;
 
 import com.hwsinha.carbid.common.PageResponse;
 import com.hwsinha.carbid.group.dto.CreateGroupRequest;
+import com.hwsinha.carbid.group.dto.GroupDetailResponse;
 import com.hwsinha.carbid.group.dto.GroupResponse;
 import com.hwsinha.carbid.group.dto.GroupSummaryResponse;
 import jakarta.validation.Valid;
@@ -46,5 +47,19 @@ public class GroupController {
             @RequestParam(defaultValue = "OPEN") GroupStatus status,
             @PageableDefault(size = 10, sort = "deadline")Pageable pageable){
         return groupService.listGroups(city, status, pageable);
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<GroupDetailResponse> details(
+            @PathVariable Long groupId){
+        return ResponseEntity.ok(groupService.getGroup(groupId));
+    }
+
+    @GetMapping("/mine")
+    @PreAuthorize("hasRole('BUYER')")
+    public PageResponse<GroupSummaryResponse> myGroups(
+            @AuthenticationPrincipal Jwt jwt,
+            @PageableDefault(size = 10, sort = "deadline") Pageable pageable) {
+        return groupService.listMyGroups(Long.valueOf(jwt.getSubject()), pageable);
     }
 }
