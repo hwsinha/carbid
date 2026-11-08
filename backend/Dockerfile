@@ -12,4 +12,4 @@ RUN useradd --system --uid 1001 appuser
 COPY --from=build /workspace/target/*.jar app.jar
 USER appuser
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=65", "-XX:+UseSerialGC", "-jar", "app.jar"]
