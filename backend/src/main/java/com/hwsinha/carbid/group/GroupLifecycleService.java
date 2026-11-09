@@ -20,7 +20,7 @@ public class GroupLifecycleService {
 
     @Transactional
     public void closeGroup(Long id) {
-        BuyGroup group = buyGroupRepository.findById(id).orElse(null);
+        BuyGroup group = buyGroupRepository.findByIdForUpdate(id).orElse(null);
         if (group == null) {
             return;
         }

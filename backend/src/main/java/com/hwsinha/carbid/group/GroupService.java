@@ -64,8 +64,8 @@ public class GroupService {
 
     @Transactional
     public GroupResponse joinGroup(Long groupId, Long userId) {
-        BuyGroup group=groupRepository.findById(groupId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+        BuyGroup group = groupRepository.findByIdForUpdate(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
         User user=userRepository.findById(userId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (group.getStatus()!= GroupStatus.OPEN) {
@@ -100,7 +100,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GroupDetailResponse getGroup(Long id) {
-        BuyGroup group=groupRepository.findById(id)
+        BuyGroup group=groupRepository.findByIdForUpdate(id)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
         Car car=group.getCar();
         long memberCount=memberRepository.countByGroupId(group.getId());

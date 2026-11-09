@@ -16,7 +16,8 @@ import java.util.Optional;
 public interface BuyGroupRepository extends JpaRepository<BuyGroup,Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<BuyGroup> findById(long id);
+    @Query("select g from BuyGroup g where g.id = :id")
+    Optional<BuyGroup> findByIdForUpdate(@Param("id") Long id);
 
     List<BuyGroup> findByStatusAndDeadlineBefore(GroupStatus status, Instant now);
     List<BuyGroup> findByStatusAndBiddingDeadlineBefore(GroupStatus status, Instant now);
