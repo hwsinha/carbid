@@ -3,6 +3,8 @@ package com.hwsinha.carbid.common;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -64,16 +66,6 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Missing required parameter: " + ex.getParameterName(), request, null);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleException(Exception ex, HttpServletRequest request) {
-        if(ex instanceof ErrorResponse er){
-            HttpStatus status=HttpStatus.valueOf(er.getStatusCode().value());
-            return build(status, status.getReasonPhrase(), request, null);
-        }
-        log.error("Unhandled Error: ", ex);
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", request, null);
-    }
-
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiError> handleMethodValidation(HandlerMethodValidationException ex,
                                                            HttpServletRequest request) {
@@ -85,6 +77,27 @@ public class GlobalExceptionHandler {
         });
         return build(HttpStatus.BAD_REQUEST, "Validation failed", request, fields);
     }
+
+    @ExceptionHandler({PropertyReferenceException.class, InvalidDataAccessApiUsageException.class})
+    public ResponseEntity<ApiError> handleInvalidSort(Exception ex, HttpServletRequest request) {
+        Throwable cause = ex instanceof PropertyReferenceException ? ex : ex.getCause();
+        if (cause instanceof PropertyReferenceException pre) {
+            return build(HttpStatus.BAD_REQUEST, "Cannot sort by '" + pre.getPropertyName() + "'", request, null);
+        }
+        log.error("Unhandled data access error", ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", request, null);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(Exception ex, HttpServletRequest request) {
+        if(ex instanceof ErrorResponse er){
+            HttpStatus status=HttpStatus.valueOf(er.getStatusCode().value());
+            return build(status, status.getReasonPhrase(), request, null);
+        }
+        log.error("Unhandled Error: ", ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", request, null);
+    }
+
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message,
                                            HttpServletRequest request, Map<String, String> fields) {
