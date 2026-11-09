@@ -25,7 +25,7 @@ public class BidService {
 
     @Transactional
     public BidResponse placeBid(Long groupId, PlaceBidRequest request, Dealer dealer) {
-        BuyGroup group = buyGroupRepository.findById(groupId)
+        BuyGroup group = buyGroupRepository.findByIdForUpdate(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, " Group not found"));
          if (group.getStatus() != GroupStatus.BIDDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Group is not accepting bids");
