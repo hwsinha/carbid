@@ -3,7 +3,8 @@
 Backend for a group car-buying platform. Buyers form a group for the same car in their city,
 dealers bid in a reverse auction, and the lowest bid wins.
 
-**Live API docs:** https://carbid-jhga.onrender.com/swagger-ui.html
+**Live API docs:** https://carbid-jhga.onrender.com/swagger-ui.html 
+<br>
 The free host sleeps when idle, so the first request can take about a minute.
 
 ## What it does
@@ -29,8 +30,4 @@ In progress: automated tests, CI, and fuller documentation.
 See `.env.example` for the required environment variables, then:
 `docker build -t carbid-backend ./backend` and
 `docker run --env-file .env -p 8080:8080 carbid-backend`
-
-## Database design
-
-![ER diagram](docs/er-diagram.png)
 
