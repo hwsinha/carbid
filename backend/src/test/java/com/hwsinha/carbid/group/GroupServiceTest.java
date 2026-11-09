@@ -81,7 +81,7 @@ class GroupServiceTest {
 
         groupService.joinGroup(GROUP_ID, USER_ID);
 
-        assertEquals(GroupStatus.OPEN, group.getStatus());
+        assertEquals(GroupStatus.BIDDING, group.getStatus());
         assertNull(group.getBiddingDeadline());
         verify(memberRepository).saveAndFlush(any(GroupMember.class));
     }
