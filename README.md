@@ -1,5 +1,7 @@
 # carbid
 
+![CI](https://github.com/hwsinha/carbid/.github/workflows/ci.yml/badge.svg)
+
 Backend for a group car-buying platform. Buyers form a group for the same car in their city,
 dealers bid in a reverse auction, and the lowest bid wins.
 
