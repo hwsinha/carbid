@@ -4,6 +4,10 @@ import com.hwsinha.carbid.bid.dto.BidResponse;
 import com.hwsinha.carbid.bid.dto.PlaceBidRequest;
 import com.hwsinha.carbid.dealer.Dealer;
 import com.hwsinha.carbid.dealer.DealerRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +27,15 @@ public class BidController {
 
     @PostMapping("/{groupId}/bids")
     @PreAuthorize("hasRole('DEALER')")
+    @Operation(summary = "Place a bid on a group (dealers only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Bid placed"),
+            @ApiResponse(responseCode = "403", description = "Not a dealer, or dealer is outside the group's city"),
+            @ApiResponse(responseCode = "409", description = "Group not accepting bids, or bid not lower than the current lowest")
+    })
     public ResponseEntity<BidResponse> placeBid(
             @PathVariable Long groupId,
-            @AuthenticationPrincipal Jwt jwt,
+            @Parameter(hidden=true) @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody PlaceBidRequest request) {
         Long userId= Long.valueOf(jwt.getSubject());
         Dealer dealer=dealerRepository.findByUserId(userId)
